@@ -127,11 +127,11 @@ int is_only_digits_arg_q(char *arg)
 int call_vibro_func(char *arg)
 {
     int i;
-    char *_arg = strdup(arg);
+    char *_arg = strtok(strdup(arg), "-");
     int modes_count = sizeof(vibro_mode) / sizeof(vibro_mode[0]);
     for (i = 0; i < modes_count; ++i) {
-        if (strtok(_arg, "-")) {
-            if (!strcmp(strtok(_arg, "-"), vibro_mode[i].name_mode)) {
+        if (_arg) {
+            if (!strcmp(_arg, vibro_mode[i].name_mode)) {
                 vibro_mode[i].vibro_func();
                 return 1;
             }
