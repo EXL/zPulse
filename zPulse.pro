@@ -35,7 +35,7 @@ CONFIG += platform-zn5
 # Global Vars
 TOOLCHAIN_PATH = /opt/toolchains/motomagx/arm-eabi
 APPNAME = zPulse
-APPEXT = .magx
+#APPEXT = .magx
 ARMLIB = $${TOOLCHAIN_PATH}/arm-linux-gnueabi/lib
 
 # For C Lang
@@ -108,6 +108,8 @@ platform-z6 {
     DEP_DEFINES += EZX_VE66
     TARGET  = $${APPNAME}_VE66$${APPEXT}
 }
+
+TARGET = $${APPNAME}
 
 # Meta Object Compiler Binary
 # Warning: MotoMagx Toolchain need the patched qmake for successful compilation

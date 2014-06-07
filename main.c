@@ -59,24 +59,7 @@ int main(int argc, char *argv[])
             }
         }
     } else if (argc == 3) {
-        if (is_only_digits_arg_q(argv[1]) && is_only_digits_arg_q(argv[2])) {
-            int i;
-            int msec = atoi(argv[1]);
-            int count = atoi(argv[2]);
-
-            if (!in_msec_range_q(msec)) {
-                print_error(0);
-                return 2;
-            }
-            if (!in_count_range_q(count)) {
-                print_error(1);
-                return 3;
-            }
-
-            for (i = 0; i < count; ++i) {
-                _vibrate(msec);
-            }
-        } else if (!is_only_digits_arg_q(argv[1]) && is_only_digits_arg_q(argv[2])) {
+        if (!is_only_digits_arg_q(argv[1]) && is_only_digits_arg_q(argv[2])) {
             int i, j = 0;
             int count = atoi(argv[2]);
 
@@ -89,12 +72,14 @@ int main(int argc, char *argv[])
                 if (!call_vibro_func(argv[1])) {
                     ++j;
                 }
+                _delay(350);
             }
 
             if (j) {
                 print_help();
             }
-        } else {
+        }
+        else {
             print_help();
         }
     } else {
@@ -105,7 +90,7 @@ int main(int argc, char *argv[])
 
 int in_msec_range_q(int msec)
 {
-    return (msec < 15 || msec > 5000) ? 0 : 1;
+    return (msec < 15 || msec > 60000) ? 0 : 1;
 }
 
 int in_count_range_q(int cnt)
@@ -153,7 +138,7 @@ void print_error(int err)
 {
     if (!err) {
         printf("ERROR: Wrong range!\n"
-               "\tThe msec should be in the range 15...5000\n");
+               "\tThe msec should be in the range 15...60000\n");
     } else if (err == 1) {
         printf("ERROR: Wrong range!\n"
                "\tThe count should be in the range 2...10\n");
@@ -166,9 +151,8 @@ void print_help()
     printf("Please use:\n"
            "\tzPulse\n"
            "\tzPulse [duration-in-msec]\n"
-           "\tzPulse [duration-in-msec]\n"
-           "\tzPulse [duration-in-msec] [count]\n"
            "\tzPulse [mode]\n"
+           "\tzPulse [mode] [count]\n"
            "Available modes:\n"
            "\t- standard\n"
            "\t- helicopter\n"
@@ -178,8 +162,8 @@ void print_help()
            "\t- train\n"
            "\t- pulse\n"
            "Examples:\n"
-           "\tzPulse 15000\n"
-           "\tzPulse 30000 4\n"
+           "\tzPulse 15\n"
+           "\tzPulse 3000\n"
            "\tzPulse mosquito\n"
            "\tzPulse -ufo 6\n"
            "\tzPulse --pulse 2\n");
@@ -195,17 +179,21 @@ void standard_vibro()
     printf("Standard vibro\n");
     _vibrate(500);
     _vibrate(500);
-    _vibrate(500);
 }
 
 void helicopter_vibro()
 {
     printf("Helicopter vibro\n");
     _vibrate(75);
+    _delay(100);
     _vibrate(100);
+    _delay(100);
     _vibrate(75);
+    _delay(100);
     _vibrate(100);
+    _delay(100);
     _vibrate(75);
+    _delay(100);
     _vibrate(100);
 }
 
@@ -213,7 +201,9 @@ void ufo_vibro()
 {
     printf("Ufo vibro\n");
     _vibrate(200);
+    _delay(300);
     _vibrate(100);
+    _delay(300);
     _vibrate(200);
 }
 
@@ -221,10 +211,15 @@ void shock_vibro()
 {
     printf("Shock vibro\n");
     _vibrate(35);
+    _delay(100);
     _vibrate(200);
+    _delay(300);
     _vibrate(35);
+    _delay(100);
     _vibrate(200);
+    _delay(300);
     _vibrate(35);
+    _delay(100);
     _vibrate(200);
 }
 
@@ -232,13 +227,21 @@ void mosquito_vibro()
 {
     printf("Mosquito vibro\n");
     _vibrate(15);
+    _delay(150);
     _vibrate(35);
+    _delay(150);
     _vibrate(55);
+    _delay(150);
     _vibrate(75);
+    _delay(150);
     _vibrate(95);
+    _delay(150);
     _vibrate(75);
+    _delay(150);
     _vibrate(55);
+    _delay(150);
     _vibrate(35);
+    _delay(150);
     _vibrate(15);
 }
 
@@ -256,8 +259,10 @@ void pulse_vibro()
 {
     printf("Pulse vibro\n");
     _vibrate(150);
+    _delay(150);
     _vibrate(150);
     _delay(500);
     _vibrate(150);
+    _delay(150);
     _vibrate(150);
 }
