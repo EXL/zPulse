@@ -153,3 +153,6 @@ INCLUDEPATH += .
 # Input
 
 SOURCES += main.c
+
+OTHER_FILES += README.md \
+            zPulse_GUI.sh
