@@ -42,10 +42,13 @@ static struct modes {
 
 int main(int argc, char *argv[])
 {
-    if (argc == 1) {
+    switch (argc) {
+    case 1: {
         vibro_mode[STANDARD].vibro_func(); // Call standard vibro function
-    } else if (argc == 2) {
-        if(!is_only_digits_arg_q(argv[1])) {
+        break;
+    }
+    case 2: {
+        if (!is_only_digits_arg_q(argv[1])) {
             if (!call_vibro_func(argv[1])) {
                 print_help();
             }
@@ -58,14 +61,16 @@ int main(int argc, char *argv[])
                 _vibrate(msec);
             }
         }
-    } else if (argc == 3) {
+        break;
+    }
+    case 3: {
         if (!is_only_digits_arg_q(argv[1]) && is_only_digits_arg_q(argv[2])) {
             int i, j = 0;
             int count = atoi(argv[2]);
 
             if (!in_count_range_q(count)) {
                 print_error(1);
-                return 4;
+                return 2;
             }
 
             for (i = 0; i < count; ++i) {
@@ -82,8 +87,12 @@ int main(int argc, char *argv[])
         else {
             print_help();
         }
-    } else {
+        break;
+    }
+    default: {
         print_help();
+        break;
+    }
     }
     return 0;
 }
@@ -100,8 +109,8 @@ int in_count_range_q(int cnt)
 
 int is_only_digits_arg_q(char *arg)
 {
-    int i;
-    for (i = 0; arg[i]; ++i) {
+    int i, size = strlen(arg);
+    for (i = 0; i < size; ++i) {
         if (!isdigit(arg[i])) {
             return 0;
         }
@@ -136,13 +145,23 @@ void _vibrate(int duration)
 
 void print_error(int err)
 {
-    if (!err) {
+    switch (err) {
+    case 0: {
         printf("ERROR: Wrong range!\n"
                "\tThe msec should be in the range 15...60000\n");
-    } else if (err == 1) {
+        break;
+    }
+    case 1: {
         printf("ERROR: Wrong range!\n"
                "\tThe count should be in the range 2...10\n");
+        break;
     }
+    default: {
+        printf("ERROR: Unknown error!\n");
+        break;
+    }
+    }
+
     print_help();
 }
 
