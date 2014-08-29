@@ -9,15 +9,6 @@
 
 #define STANDARD 0
 
-int main(int argc, char *argv[]);
-void _vibrate(int duration);
-void _delay(int msec);
-int in_msec_range_q(int msec);
-int in_count_range_q(int cnt);
-int is_only_digits_arg_q(char *arg);
-int call_vibro_func(char *arg);
-void print_error(int err);
-void print_help();
 void standard_vibro();
 void helicopter_vibro();
 void ufo_vibro();
@@ -39,6 +30,103 @@ static struct modes {
 { "train", 3, train_vibro },
 { "pulse", 3, pulse_vibro }
 };
+
+void _delay(int msec)
+{
+    usleep(msec * 1000);
+}
+
+void _vibrate(int duration)
+{
+    int power_ic = open("/dev/" POWER_IC_DEV_NAME, O_RDWR);
+    ioctl(power_ic, POWER_IC_IOCTL_PERIPH_SET_VIBRATOR_ON,1);
+    usleep(duration * 1000);
+    ioctl(power_ic, POWER_IC_IOCTL_PERIPH_SET_VIBRATOR_ON,0);
+    close(power_ic);
+}
+
+int in_count_range_q(int cnt)
+{
+    return (cnt < 2 || cnt > 10) ? 0 : 1;
+}
+
+int in_msec_range_q(int msec)
+{
+    return (msec < 15 || msec > 60000) ? 0 : 1;
+}
+
+void print_error(int err)
+{
+    switch (err) {
+    case 0: {
+        printf("ERROR: Wrong range!\n"
+               "\tThe msec should be in the range 15...60000\n");
+        break;
+    }
+    case 1: {
+        printf("ERROR: Wrong range!\n"
+               "\tThe count should be in the range 2...10\n");
+        break;
+    }
+    default: {
+        printf("ERROR: Unknown error!\n");
+        break;
+    }
+    }
+
+    print_help();
+}
+
+void print_help()
+{
+    printf("Please use:\n"
+           "\tzPulse\n"
+           "\tzPulse [duration-in-msec]\n"
+           "\tzPulse [mode]\n"
+           "\tzPulse [mode] [count]\n"
+           "Available modes:\n"
+           "\t- standard\n"
+           "\t- helicopter\n"
+           "\t- ufo\n"
+           "\t- shock\n"
+           "\t- mosquito\n"
+           "\t- train\n"
+           "\t- pulse\n"
+           "Examples:\n"
+           "\tzPulse 15\n"
+           "\tzPulse 3000\n"
+           "\tzPulse mosquito\n"
+           "\tzPulse -ufo 6\n"
+           "\tzPulse --pulse 2\n");
+}
+
+int call_vibro_func(const char *arg)
+{
+    int i;
+    const char *_arg = strtok(strdup(arg), "-");
+    const int modes_count = sizeof(vibro_mode) / sizeof(vibro_mode[0]);
+    for (i = 0; i < modes_count; ++i) {
+        if (_arg) {
+            if (!strcmp(_arg, vibro_mode[i].name_mode)) {
+                vibro_mode[i].vibro_func();
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int is_only_digits_arg_q(const char *arg)
+{
+    int i;
+    const int size = strlen(arg);
+    for (i = 0; i < size; ++i) {
+        if (!isdigit(arg[i])) {
+            return 0;
+        }
+    }
+    return 1;
+}
 
 int main(int argc, char *argv[])
 {
@@ -95,102 +183,6 @@ int main(int argc, char *argv[])
     }
     }
     return 0;
-}
-
-int in_msec_range_q(int msec)
-{
-    return (msec < 15 || msec > 60000) ? 0 : 1;
-}
-
-int in_count_range_q(int cnt)
-{
-    return (cnt < 2 || cnt > 10) ? 0 : 1;
-}
-
-int is_only_digits_arg_q(char *arg)
-{
-    int i, size = strlen(arg);
-    for (i = 0; i < size; ++i) {
-        if (!isdigit(arg[i])) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int call_vibro_func(char *arg)
-{
-    int i;
-    char *_arg = strtok(strdup(arg), "-");
-    int modes_count = sizeof(vibro_mode) / sizeof(vibro_mode[0]);
-    for (i = 0; i < modes_count; ++i) {
-        if (_arg) {
-            if (!strcmp(_arg, vibro_mode[i].name_mode)) {
-                vibro_mode[i].vibro_func();
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
-
-void _vibrate(int duration)
-{
-    int power_ic = open("/dev/" POWER_IC_DEV_NAME, O_RDWR);
-    ioctl(power_ic, POWER_IC_IOCTL_PERIPH_SET_VIBRATOR_ON,1);
-    usleep(duration * 1000);
-    ioctl(power_ic, POWER_IC_IOCTL_PERIPH_SET_VIBRATOR_ON,0);
-    close(power_ic);
-}
-
-void print_error(int err)
-{
-    switch (err) {
-    case 0: {
-        printf("ERROR: Wrong range!\n"
-               "\tThe msec should be in the range 15...60000\n");
-        break;
-    }
-    case 1: {
-        printf("ERROR: Wrong range!\n"
-               "\tThe count should be in the range 2...10\n");
-        break;
-    }
-    default: {
-        printf("ERROR: Unknown error!\n");
-        break;
-    }
-    }
-
-    print_help();
-}
-
-void print_help()
-{
-    printf("Please use:\n"
-           "\tzPulse\n"
-           "\tzPulse [duration-in-msec]\n"
-           "\tzPulse [mode]\n"
-           "\tzPulse [mode] [count]\n"
-           "Available modes:\n"
-           "\t- standard\n"
-           "\t- helicopter\n"
-           "\t- ufo\n"
-           "\t- shock\n"
-           "\t- mosquito\n"
-           "\t- train\n"
-           "\t- pulse\n"
-           "Examples:\n"
-           "\tzPulse 15\n"
-           "\tzPulse 3000\n"
-           "\tzPulse mosquito\n"
-           "\tzPulse -ufo 6\n"
-           "\tzPulse --pulse 2\n");
-}
-
-void _delay(int msec)
-{
-    usleep(msec * 1000);
 }
 
 void standard_vibro()
