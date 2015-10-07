@@ -1,7 +1,7 @@
 zPulse
 ==============
 
-Demonstrate the different styles and modes of vibration like on Siemens phones on MotoMAGX phones.
+Demonstrating the different styles and modes of vibration like on Siemens phones on MotoMAGX phones.
 
 ## Interface
 
